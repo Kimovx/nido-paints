@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="NIDO">
+  <rect width="64" height="64" rx="18" fill="#f8fbff"/>
+  <g transform="translate(32 34)">
+    <path d="M0-19C-4-19-9-10-9-3c0 6 4 10 9 10s9-4 9-10c0-7-5-16-9-16Z" fill="#33b7d2" transform="rotate(-54)"/>
+    <path d="M0-19C-4-19-9-10-9-3c0 6 4 10 9 10s9-4 9-10c0-7-5-16-9-16Z" fill="#f72da4" transform="rotate(-27)"/>
+    <path d="M0-19C-4-19-9-10-9-3c0 6 4 10 9 10s9-4 9-10c0-7-5-16-9-16Z" fill="#8e44c7" transform="rotate(0)"/>
+    <path d="M0-19C-4-19-9-10-9-3c0 6 4 10 9 10s9-4 9-10c0-7-5-16-9-16Z" fill="#59bd87" transform="rotate(27)"/>
+    <path d="M0-19C-4-19-9-10-9-3c0 6 4 10 9 10s9-4 9-10c0-7-5-16-9-16Z" fill="#e6db32" transform="rotate(54)"/>
+    <ellipse cx="0" cy="8" rx="10" ry="13" fill="#260064"/>
+    <ellipse cx="0" cy="8" rx="6" ry="8" fill="#ffffff" opacity="0.18"/>
+  </g>
+</svg>

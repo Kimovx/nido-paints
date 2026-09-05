@@ -33,6 +33,176 @@ body {
   overflow-x: hidden;
 }
 
+html.is-loading,
+html.is-loading body {
+  overflow: hidden;
+}
+
+.page-loader {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(255, 255, 255, 0.96);
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.35s var(--ease),
+    visibility 0.35s var(--ease);
+}
+
+html.is-loaded .page-loader {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.loader-shell {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+}
+
+.nido-loader {
+  position: relative;
+  width: 100px;
+  height: 100px;
+  animation: loader-float 2.4s ease-in-out infinite;
+}
+
+.petal {
+  position: absolute;
+  left: 50%;
+  bottom: 16px;
+  width: 34px;
+  height: 62px;
+  border-radius: 100% 0 100% 0;
+  transform-origin: 50% 100%;
+  opacity: 0.9;
+  animation: petal-pulse 1.6s ease-in-out infinite;
+}
+
+.petal:nth-child(1) {
+  background: #f72da4;
+  transform: translateX(-50%) rotate(-55deg);
+  animation-delay: 0s;
+}
+
+.petal:nth-child(2) {
+  background: #9d48c9;
+  transform: translateX(-50%) rotate(-28deg);
+  animation-delay: 0.1s;
+}
+
+.petal:nth-child(3) {
+  background: #33b7d2;
+  transform: translateX(-50%) rotate(0deg);
+  animation-delay: 0.2s;
+}
+
+.petal:nth-child(4) {
+  background: #e6db32;
+  transform: translateX(-50%) rotate(28deg);
+  animation-delay: 0.3s;
+}
+
+.petal:nth-child(5) {
+  background: #59bd87;
+  transform: translateX(-50%) rotate(55deg);
+  animation-delay: 0.4s;
+}
+
+.center {
+  position: absolute;
+  left: 50%;
+  bottom: 5px;
+  width: 28px;
+  height: 42px;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: #260064;
+  z-index: 1;
+  box-shadow:
+    0 0 0 4px #fff,
+    0 8px 25px rgba(38, 0, 100, 0.18);
+  animation: center-pulse 1.6s ease-in-out infinite;
+}
+
+.loading-bar {
+  position: relative;
+  width: 150px;
+  height: 4px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: rgba(38, 0, 100, 0.1);
+}
+
+.loading-bar::after {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: -45%;
+  width: 45%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    #f72da4,
+    #8e44c7,
+    #22b8d5,
+    #59bd87,
+    #e6db32
+  );
+  animation: loading 1.5s ease-in-out infinite;
+}
+
+@keyframes petal-pulse {
+  0%,
+  100% {
+    scale: 0.85;
+    opacity: 0.55;
+  }
+
+  50% {
+    scale: 1;
+    opacity: 0.95;
+  }
+}
+
+@keyframes center-pulse {
+  0%,
+  100% {
+    scale: 0.9;
+  }
+
+  50% {
+    scale: 1.05;
+  }
+}
+
+@keyframes loader-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-6px);
+  }
+}
+
+@keyframes loading {
+  0% {
+    left: -45%;
+  }
+
+  100% {
+    left: 105%;
+  }
+}
+
 body.menu-open {
   overflow: hidden;
 }
@@ -1052,7 +1222,6 @@ body.menu-open .menu-toggle span:last-child {
 
 .lifestyle-band {
   position: relative;
-  min-height: 72vh;
   display: grid;
   align-items: center;
   padding: clamp(72px, 9vw, 130px) clamp(18px, 6vw, 96px);

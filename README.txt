@@ -6,10 +6,10 @@
 المحتوى الحالي:
 - واجهة عربية بالكامل باتجاه RTL.
 - هيدر شفاف فوق الهيرو ويتحول لخلفية واضحة بعد التمرير.
-- سلايدر رئيسي يعتمد على Lottie فقط مع طبقة تعتيم ناعمة وشعار NIDO في المنتصف.
-- تشغيل Lottie من hero.json مع fallback من hero-data.js عند الحاجة.
+- سلايدر رئيسي يعتمد على Lottie مع طبقة تعتيم ناعمة وشعار NIDO في المنتصف.
+- يتم استخدام `assets/optimized/hero-data.js` مع صور الهيرو المحسنة داخل `assets/optimized/hero/`.
 - تصنيفات المنتجات: دهانات، ادوات باستخدام صور التصنيفات المحلية.
-- قسم المنتجات: سلايدر للدهانات وسلايدر للادوات باستخدام كل صور assets/paints-products.
+- قسم المنتجات: سلايدر للدهانات وسلايدر للادوات باستخدام الصور المحسنة داخل `assets/optimized`.
 - منتجات مختارة، قسم إلهام، قسم شراكة، وقسم تواصل بالبيانات الرسمية.
 
 ملاحظات:
@@ -19,10 +19,8 @@
 
 Performance / asset maintenance
 -------------------------------
-The page serves assets/optimized; original assets and hero.json are retained as sources.
+The page serves only the optimized assets that are still referenced by the site.
 Regenerate delivery assets with Python 3 + Pillow: python scripts/optimize_assets.py
-The generated manifest records image dimensions and responsive variants. If source
-filenames or dimensions change, update HTML/app.js references to match the manifest.
 No build step or package manager is required to serve the site.
 
 Measured file sizes (not a Lighthouse score):

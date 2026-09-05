@@ -29,6 +29,7 @@
   const activeColorTag = qs("#active-color-tag");
   const backToTop = qs(".back-to-top");
   const fixedContactActions = qs(".fixed-contact-actions");
+  const root = document.documentElement;
 
   const toolProducts = [
     { name: "دهان مركز", category: "ادوات - تجهيز", width: 640, height: 853 },
@@ -101,8 +102,8 @@
   const buildProductCardMarkup = ({ imagePath, title, category, width, height }) => `
     <article class="product-card">
       <div class="product-image">
-        <img src="${imagePath.replace('assets/', 'assets/optimized/').replace('.webp', '-640.webp')}"
-          srcset="${imagePath.replace('assets/', 'assets/optimized/').replace('.webp', '-320.webp').replaceAll(' ', '%20')} 320w, ${imagePath.replace('assets/', 'assets/optimized/').replace('.webp', '-640.webp').replaceAll(' ', '%20')} 640w"
+        <img src="${imagePath.replace('.webp', '-640.webp')}"
+          srcset="${imagePath.replace('.webp', '-320.webp').replaceAll(' ', '%20')} 320w, ${imagePath.replace('.webp', '-640.webp').replaceAll(' ', '%20')} 640w"
           sizes="(max-width: 620px) 78vw, 320px" loading="lazy" decoding="async" width="${width}" height="${height}" alt="${title} من نيدو" />
       </div>
       <h3>${title} <span>${category}</span></h3>
@@ -192,7 +193,7 @@
     toolsProductsHost.innerHTML = toolProducts
       .map(({ name, category, width, height }) =>
         buildProductCardMarkup({
-          imagePath: `assets/tools-products/${name}.webp`,
+          imagePath: `assets/optimized/tools-products/${name}.webp`,
           title: name,
           category, width, height
         })
@@ -414,6 +415,14 @@
     clearInterval(sliderTimer);
   });
   window.addEventListener("pageshow", syncHeroPlayback);
+
+  const finishPageLoad = () => {
+    root.classList.remove("is-loading");
+    root.classList.add("is-loaded");
+  };
+
+  if (document.readyState === "complete") finishPageLoad();
+  else window.addEventListener("load", finishPageLoad, { once: true });
 
   const closeMenu = () => {
     nav?.classList.remove("open");
