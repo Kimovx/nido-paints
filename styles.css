@@ -859,6 +859,7 @@ body.menu-open .menu-toggle span:last-child {
 
 .product-slider-block {
   margin-top: clamp(34px, 5vw, 64px);
+  scroll-margin-top: 112px;
 }
 
 .product-slider-block:first-of-type {
