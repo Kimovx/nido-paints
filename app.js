@@ -1,6 +1,21 @@
 (() => {
   const qs = (selector, root = document) => root.querySelector(selector);
   const qsa = (selector, root = document) => [...root.querySelectorAll(selector)];
+  const reducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const connection = navigator.connection;
+  const saveData = () => connection?.saveData || /(^|-)2g$/.test(connection?.effectiveType || "");
+  const scheduleIdleTask = (callback, timeout = 1200) => {
+    if ("requestIdleCallback" in window) window.requestIdleCallback(callback, { timeout });
+    else window.setTimeout(callback, Math.min(timeout, 250));
+  };
+  const frameThrottle = (callback) => {
+    let pending = false;
+    return () => {
+      if (pending) return;
+      pending = true;
+      requestAnimationFrame(() => { pending = false; callback(); });
+    };
+  };
 
   const header = qs(".site-header");
   const menuToggle = qs(".menu-toggle");
@@ -16,12 +31,12 @@
   const fixedContactActions = qs(".fixed-contact-actions");
 
   const toolProducts = [
-    { name: "دهان مركز", category: "ادوات - تجهيز" },
-    { name: "رولة دهان", category: "ادوات - تطبيق" },
-    { name: "سبراي", category: "ادوات - رش" },
-    { name: "سكينة معجون", category: "ادوات - تجهيز" },
-    { name: "فرشة دهان", category: "ادوات - تطبيق" },
-    { name: "لزق اصفر", category: "ادوات - حماية" }
+    { name: "دهان مركز", category: "ادوات - تجهيز", width: 640, height: 853 },
+    { name: "رولة دهان", category: "ادوات - تطبيق", width: 640, height: 718 },
+    { name: "سبراي", category: "ادوات - رش", width: 640, height: 849 },
+    { name: "سكينة معجون", category: "ادوات - تجهيز", width: 640, height: 531 },
+    { name: "فرشة دهان", category: "ادوات - تطبيق", width: 640, height: 640 },
+    { name: "لزق اصفر", category: "ادوات - حماية", width: 640, height: 715 }
   ];
 
   const colorStories = [
@@ -79,11 +94,14 @@
   let sliderTimer = null;
   let heroAnimationBooted = false;
   let heroAnimationInstance = null;
+  let heroVisible = false;
 
-  const buildProductCardMarkup = ({ imagePath, title, category }) => `
+  const buildProductCardMarkup = ({ imagePath, title, category, width, height }) => `
     <article class="product-card">
       <div class="product-image">
-        <img src="${imagePath}" alt="${title} من نيدو" />
+        <img src="${imagePath.replace('assets/', 'assets/optimized/').replace('.webp', '-640.webp')}"
+          srcset="${imagePath.replace('assets/', 'assets/optimized/').replace('.webp', '-320.webp').replaceAll(' ', '%20')} 320w, ${imagePath.replace('assets/', 'assets/optimized/').replace('.webp', '-640.webp').replaceAll(' ', '%20')} 640w"
+          sizes="(max-width: 620px) 78vw, 320px" loading="lazy" decoding="async" width="${width}" height="${height}" alt="${title} من نيدو" />
       </div>
       <h3>${title} <span>${category}</span></h3>
     </article>
@@ -94,7 +112,9 @@
 
     if (!colorStory || !activeColorImage) return;
 
-    activeColorImage.src = `assets/colors-categories/${colorStory.file}`;
+    const colorPath = `assets/optimized/colors-categories/${colorStory.file.replace('.webp', '')}`;
+    activeColorImage.srcset = `${colorPath}-640.webp 640w, ${colorPath}-1280.webp 1280w`;
+    activeColorImage.src = `${colorPath}-1280.webp`;
     activeColorImage.alt = `مشهد بلون ${colorStory.name} من نيدو`;
 
     if (activeColorTag) activeColorTag.textContent = colorStory.tag;
@@ -129,7 +149,7 @@
   };
 
   if (colorSwatchesHost) {
-    colorSwatchesHost.addEventListener("scroll", updateColorSwatchFades, { passive: true });
+    colorSwatchesHost.addEventListener("scroll", frameThrottle(updateColorSwatchFades), { passive: true });
     new ResizeObserver(updateColorSwatchFades).observe(colorSwatchesHost);
   }
 
@@ -168,79 +188,108 @@
     if (!toolsProductsHost) return;
 
     toolsProductsHost.innerHTML = toolProducts
-      .map(({ name, category }) =>
+      .map(({ name, category, width, height }) =>
         buildProductCardMarkup({
           imagePath: `assets/tools-products/${name}.webp`,
           title: name,
-          category
+          category, width, height
         })
       )
       .join("");
   };
 
-  const loadHeroAnimation = (config) => {
-    heroAnimationInstance?.destroy();
+  const loadScript = (src) => new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = true;
+    script.onload = resolve;
+    script.onerror = () => { script.remove(); reject(new Error(`Unable to load ${src}`)); };
+    document.head.append(script);
+  });
 
-    heroAnimationInstance = window.lottie.loadAnimation({
-      container: lottieHost,
-      renderer: "svg",
-      loop: true,
-      autoplay: true,
-      rendererSettings: {
-        preserveAspectRatio: "xMidYMid slice",
-        progressiveLoad: true
-      },
-      ...config
-    });
+  const shouldAnimate = () => heroVisible && !document.hidden && !reducedMotion.matches && !saveData();
 
-    return heroAnimationInstance;
-  };
-
-  const bootLottie = (attempt = 0) => {
-    if (heroAnimationBooted || !lottieHost) return;
-
-    if (!window.lottie) {
-      if (attempt < 40) {
-        window.setTimeout(() => bootLottie(attempt + 1), 150);
-      }
-
+  const deferUntilNearViewport = (selector, callback, { rootMargin = "240px 0px" } = {}) => {
+    const target = qs(selector);
+    if (!target) {
+      callback();
       return;
     }
 
+    let started = false;
+    const run = () => {
+      if (started) return;
+      started = true;
+      cleanup();
+      callback();
+    };
+
+    const isNearViewport = () => {
+      const rect = target.getBoundingClientRect();
+      const margin = Math.max(window.innerHeight * 0.35, 180);
+      return rect.top <= window.innerHeight + margin && rect.bottom >= -margin;
+    };
+
+    const onViewportChange = frameThrottle(() => {
+      if (isNearViewport()) run();
+    });
+
+    let observer = null;
+    const cleanup = () => {
+      observer?.disconnect();
+      window.removeEventListener("scroll", onViewportChange);
+      window.removeEventListener("resize", onViewportChange);
+    };
+
+    if (!("IntersectionObserver" in window)) {
+      window.addEventListener("scroll", onViewportChange, { passive: true });
+      window.addEventListener("resize", onViewportChange, { passive: true });
+      onViewportChange();
+      scheduleIdleTask(run, 1600);
+      return;
+    }
+
+    observer = new IntersectionObserver(
+      ([entry]) => {
+        if (!entry.isIntersecting) return;
+        run();
+      },
+      { rootMargin, threshold: 0.01 }
+    );
+
+    observer.observe(target);
+    window.addEventListener("scroll", onViewportChange, { passive: true });
+    window.addEventListener("resize", onViewportChange, { passive: true });
+    onViewportChange();
+  };
+
+  const bootLottie = async () => {
+    if (heroAnimationBooted || !lottieHost || !shouldAnimate()) return;
     heroAnimationBooted = true;
-    lottieHost.classList.remove("is-error");
-
-    const markReady = () => {
-      lottieHost.classList.add("is-ready");
-    };
-
-    const loadEmbeddedAnimation = () => {
-      if (!window.NIDO_HERO_ANIMATION) return false;
-
-      const embeddedAnimation = loadHeroAnimation({
-        animationData: window.NIDO_HERO_ANIMATION
+    try {
+      await Promise.all([
+        window.lottie ? Promise.resolve() : loadScript("https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"),
+        window.NIDO_HERO_ANIMATION ? Promise.resolve() : loadScript("assets/optimized/hero-data.js")
+      ]);
+      heroAnimationInstance = window.lottie.loadAnimation({
+        container: lottieHost,
+        renderer: "svg",
+        loop: true,
+        autoplay: false,
+        animationData: window.NIDO_HERO_ANIMATION,
+        rendererSettings: { preserveAspectRatio: "xMidYMid slice", progressiveLoad: true }
       });
-
-      embeddedAnimation.addEventListener("DOMLoaded", markReady);
-      embeddedAnimation.addEventListener("data_ready", markReady);
-      embeddedAnimation.addEventListener("data_failed", () => {
-        lottieHost.classList.add("is-error");
+      heroAnimationInstance.setSubframe(false);
+      heroAnimationInstance.addEventListener("DOMLoaded", () => {
+        lottieHost.classList.add("is-ready");
+        syncHeroPlayback();
       });
-
-      return true;
-    };
-
-    if (loadEmbeddedAnimation()) return;
-
-    const animation = loadHeroAnimation({
-      path: "./hero.json"
-    });
-
-    animation.addEventListener("DOMLoaded", markReady);
-    animation.addEventListener("data_ready", markReady);
-    animation.addEventListener("data_failed", () => {
+      heroAnimationInstance.addEventListener("data_failed", () => lottieHost.classList.add("is-error"));
+      syncHeroPlayback();
+    } catch (error) {
       lottieHost.classList.add("is-error");
-    });
+      console.warn("Hero animation unavailable", error);
+    }
   };
 
   const showSlide = (index) => {
@@ -262,9 +311,8 @@
   };
 
   const startSlider = () => {
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
-
     clearInterval(sliderTimer);
+    if (!shouldAnimate() || slides.length < 2) return;
     sliderTimer = setInterval(() => {
       showSlide(activeSlide + 1);
     }, 6500);
@@ -277,18 +325,45 @@
     });
   });
 
-  renderToolsProducts();
+  deferUntilNearViewport(".products-section", () => {
+    renderToolsProducts();
+    updateAllProductFades();
+  }, { rootMargin: "320px 0px" });
+
   renderColorSwatches();
+
   showSlide(0);
-  startSlider();
+  const syncHeroPlayback = () => {
+    if (shouldAnimate()) {
+      bootLottie();
+      heroAnimationInstance?.play();
+      startSlider();
+    } else {
+      heroAnimationInstance?.pause();
+      clearInterval(sliderTimer);
+    }
+  };
 
-  if (document.readyState !== "loading") {
-    bootLottie();
-  } else {
-    document.addEventListener("DOMContentLoaded", () => bootLottie(), { once: true });
-  }
-
-  window.addEventListener("load", () => bootLottie(), { once: true });
+  // Let text, navigation, and styles render before starting decorative media.
+  const observeHero = () => {
+    const hero = qs(".hero-slider");
+    if (!hero) return;
+    new IntersectionObserver(([entry]) => {
+      heroVisible = entry.isIntersecting;
+      syncHeroPlayback();
+    }, { threshold: 0 }).observe(hero);
+  };
+  const scheduleHero = () => scheduleIdleTask(observeHero, 1500);
+  if (document.readyState === "complete") scheduleHero();
+  else window.addEventListener("load", scheduleHero, { once: true });
+  document.addEventListener("visibilitychange", syncHeroPlayback);
+  reducedMotion.addEventListener("change", syncHeroPlayback);
+  connection?.addEventListener("change", syncHeroPlayback);
+  window.addEventListener("pagehide", () => {
+    heroAnimationInstance?.pause();
+    clearInterval(sliderTimer);
+  });
+  window.addEventListener("pageshow", syncHeroPlayback);
 
   const closeMenu = () => {
     nav?.classList.remove("open");
@@ -336,7 +411,7 @@
       closeMenu();
 
       target.scrollIntoView({
-        behavior: "smooth",
+        behavior: reducedMotion.matches ? "auto" : "smooth",
         block: "start"
       });
     });
@@ -357,7 +432,7 @@
 
       carousel.scrollBy({
         left: direction * distance * rtlFactor,
-        behavior: "smooth"
+        behavior: reducedMotion.matches ? "auto" : "smooth"
       });
 
       setTimeout(() => updateProductFades(carousel), 280);
@@ -393,12 +468,10 @@
   };
 
   qsa(".product-carousel").forEach((carousel) => {
-    carousel.addEventListener("scroll", () => {
-      requestAnimationFrame(() => updateProductFades(carousel));
-    }, { passive: true });
+    carousel.addEventListener("scroll", frameThrottle(() => updateProductFades(carousel)), { passive: true });
   });
 
-  window.addEventListener("resize", updateAllProductFades);
+  window.addEventListener("resize", frameThrottle(updateAllProductFades));
   window.addEventListener("load", updateAllProductFades);
   updateAllProductFades();
 
@@ -429,10 +502,14 @@
   };
 
   setHeaderState();
-  window.addEventListener("scroll", setHeaderState, { passive: true });
+  window.addEventListener("scroll", frameThrottle(setHeaderState), { passive: true });
 
   const mobileScrollMedia = window.matchMedia("(max-width: 620px)");
   const updateScrollFade = () => {
+    if (!mobileScrollMedia.matches) {
+      document.body.classList.remove("can-scroll-down");
+      return;
+    }
     const remainingScroll = document.documentElement.scrollHeight
       - window.innerHeight - window.scrollY;
 
@@ -442,8 +519,8 @@
     );
   };
 
-  window.addEventListener("scroll", updateScrollFade, { passive: true });
-  window.addEventListener("resize", updateScrollFade);
+  window.addEventListener("scroll", frameThrottle(updateScrollFade), { passive: true });
+  window.addEventListener("resize", frameThrottle(updateScrollFade));
   window.addEventListener("load", updateScrollFade);
   mobileScrollMedia.addEventListener("change", updateScrollFade);
   new ResizeObserver(updateScrollFade).observe(document.body);

@@ -1,0 +1,350 @@
+{
+  "assets/logo.png": [
+    {
+      "src": "assets/optimized/logo-160.webp",
+      "width": 160,
+      "height": 95
+    },
+    {
+      "src": "assets/optimized/logo-320.webp",
+      "width": 320,
+      "height": 189
+    }
+  ],
+  "assets/paints-category.png": [
+    {
+      "src": "assets/optimized/paints-category-640.webp",
+      "width": 640,
+      "height": 640
+    },
+    {
+      "src": "assets/optimized/paints-category-1280.webp",
+      "width": 1254,
+      "height": 1254
+    }
+  ],
+  "assets/tools-section.png": [
+    {
+      "src": "assets/optimized/tools-section-640.webp",
+      "width": 640,
+      "height": 640
+    },
+    {
+      "src": "assets/optimized/tools-section-1280.webp",
+      "width": 1254,
+      "height": 1254
+    }
+  ],
+  "assets/colors-categories/01_فانيليا-لاتيه.webp": [
+    {
+      "src": "assets/optimized/colors-categories/01_فانيليا-لاتيه-640.webp",
+      "width": 640,
+      "height": 743
+    },
+    {
+      "src": "assets/optimized/colors-categories/01_فانيليا-لاتيه-1280.webp",
+      "width": 1164,
+      "height": 1351
+    }
+  ],
+  "assets/colors-categories/02_ازرق.webp": [
+    {
+      "src": "assets/optimized/colors-categories/02_ازرق-640.webp",
+      "width": 640,
+      "height": 743
+    },
+    {
+      "src": "assets/optimized/colors-categories/02_ازرق-1280.webp",
+      "width": 1164,
+      "height": 1351
+    }
+  ],
+  "assets/colors-categories/03_ابيض.webp": [
+    {
+      "src": "assets/optimized/colors-categories/03_ابيض-640.webp",
+      "width": 640,
+      "height": 743
+    },
+    {
+      "src": "assets/optimized/colors-categories/03_ابيض-1280.webp",
+      "width": 1164,
+      "height": 1351
+    }
+  ],
+  "assets/colors-categories/04_بريز.webp": [
+    {
+      "src": "assets/optimized/colors-categories/04_بريز-640.webp",
+      "width": 640,
+      "height": 743
+    },
+    {
+      "src": "assets/optimized/colors-categories/04_بريز-1280.webp",
+      "width": 1164,
+      "height": 1351
+    }
+  ],
+  "assets/colors-categories/05_زيتي.webp": [
+    {
+      "src": "assets/optimized/colors-categories/05_زيتي-640.webp",
+      "width": 640,
+      "height": 743
+    },
+    {
+      "src": "assets/optimized/colors-categories/05_زيتي-1280.webp",
+      "width": 1164,
+      "height": 1351
+    }
+  ],
+  "assets/colors-categories/06_لبني.webp": [
+    {
+      "src": "assets/optimized/colors-categories/06_لبني-640.webp",
+      "width": 640,
+      "height": 743
+    },
+    {
+      "src": "assets/optimized/colors-categories/06_لبني-1280.webp",
+      "width": 1164,
+      "height": 1351
+    }
+  ],
+  "assets/colors-categories/07_زيتوني.webp": [
+    {
+      "src": "assets/optimized/colors-categories/07_زيتوني-640.webp",
+      "width": 640,
+      "height": 743
+    },
+    {
+      "src": "assets/optimized/colors-categories/07_زيتوني-1280.webp",
+      "width": 1164,
+      "height": 1351
+    }
+  ],
+  "assets/colors-categories/08_نبيتي.webp": [
+    {
+      "src": "assets/optimized/colors-categories/08_نبيتي-640.webp",
+      "width": 640,
+      "height": 743
+    },
+    {
+      "src": "assets/optimized/colors-categories/08_نبيتي-1280.webp",
+      "width": 1164,
+      "height": 1351
+    }
+  ],
+  "assets/paints-products/paint-lacquer-oil-1.webp": [
+    {
+      "src": "assets/optimized/paints-products/paint-lacquer-oil-1-320.webp",
+      "width": 320,
+      "height": 320
+    },
+    {
+      "src": "assets/optimized/paints-products/paint-lacquer-oil-1-640.webp",
+      "width": 640,
+      "height": 640
+    }
+  ],
+  "assets/paints-products/paint-oil-2.webp": [
+    {
+      "src": "assets/optimized/paints-products/paint-oil-2-320.webp",
+      "width": 320,
+      "height": 427
+    },
+    {
+      "src": "assets/optimized/paints-products/paint-oil-2-640.webp",
+      "width": 640,
+      "height": 854
+    }
+  ],
+  "assets/paints-products/paint-plastic-putty-water-8.webp": [
+    {
+      "src": "assets/optimized/paints-products/paint-plastic-putty-water-8-320.webp",
+      "width": 320,
+      "height": 320
+    },
+    {
+      "src": "assets/optimized/paints-products/paint-plastic-putty-water-8-640.webp",
+      "width": 640,
+      "height": 640
+    }
+  ],
+  "assets/paints-products/paint-plastic-putty-water-9.webp": [
+    {
+      "src": "assets/optimized/paints-products/paint-plastic-putty-water-9-320.webp",
+      "width": 320,
+      "height": 427
+    },
+    {
+      "src": "assets/optimized/paints-products/paint-plastic-putty-water-9-640.webp",
+      "width": 640,
+      "height": 853
+    }
+  ],
+  "assets/paints-products/paint-plastic-water-1.webp": [
+    {
+      "src": "assets/optimized/paints-products/paint-plastic-water-1-320.webp",
+      "width": 320,
+      "height": 213
+    },
+    {
+      "src": "assets/optimized/paints-products/paint-plastic-water-1-640.webp",
+      "width": 640,
+      "height": 427
+    }
+  ],
+  "assets/paints-products/paint-plastic-water-4.webp": [
+    {
+      "src": "assets/optimized/paints-products/paint-plastic-water-4-320.webp",
+      "width": 320,
+      "height": 240
+    },
+    {
+      "src": "assets/optimized/paints-products/paint-plastic-water-4-640.webp",
+      "width": 640,
+      "height": 480
+    }
+  ],
+  "assets/paints-products/paint-plastic-water-5.webp": [
+    {
+      "src": "assets/optimized/paints-products/paint-plastic-water-5-320.webp",
+      "width": 320,
+      "height": 240
+    },
+    {
+      "src": "assets/optimized/paints-products/paint-plastic-water-5-640.webp",
+      "width": 640,
+      "height": 480
+    }
+  ],
+  "assets/paints-products/paint-primont-oil-3.webp": [
+    {
+      "src": "assets/optimized/paints-products/paint-primont-oil-3-320.webp",
+      "width": 320,
+      "height": 320
+    },
+    {
+      "src": "assets/optimized/paints-products/paint-primont-oil-3-640.webp",
+      "width": 640,
+      "height": 640
+    }
+  ],
+  "assets/paints-products/paint-putty-water-7.webp": [
+    {
+      "src": "assets/optimized/paints-products/paint-putty-water-7-320.webp",
+      "width": 320,
+      "height": 400
+    },
+    {
+      "src": "assets/optimized/paints-products/paint-putty-water-7-640.webp",
+      "width": 640,
+      "height": 800
+    }
+  ],
+  "assets/paints-products/paint-sealer-water-2.webp": [
+    {
+      "src": "assets/optimized/paints-products/paint-sealer-water-2-320.webp",
+      "width": 320,
+      "height": 240
+    },
+    {
+      "src": "assets/optimized/paints-products/paint-sealer-water-2-640.webp",
+      "width": 640,
+      "height": 480
+    }
+  ],
+  "assets/paints-products/paint-semi-gloss-water-3.webp": [
+    {
+      "src": "assets/optimized/paints-products/paint-semi-gloss-water-3-320.webp",
+      "width": 320,
+      "height": 240
+    },
+    {
+      "src": "assets/optimized/paints-products/paint-semi-gloss-water-3-640.webp",
+      "width": 640,
+      "height": 480
+    }
+  ],
+  "assets/paints-products/paint-varnish-water-6.webp": [
+    {
+      "src": "assets/optimized/paints-products/paint-varnish-water-6-320.webp",
+      "width": 320,
+      "height": 361
+    },
+    {
+      "src": "assets/optimized/paints-products/paint-varnish-water-6-640.webp",
+      "width": 640,
+      "height": 722
+    }
+  ],
+  "assets/tools-products/دهان مركز.webp": [
+    {
+      "src": "assets/optimized/tools-products/دهان مركز-320.webp",
+      "width": 320,
+      "height": 427
+    },
+    {
+      "src": "assets/optimized/tools-products/دهان مركز-640.webp",
+      "width": 640,
+      "height": 853
+    }
+  ],
+  "assets/tools-products/رولة دهان.webp": [
+    {
+      "src": "assets/optimized/tools-products/رولة دهان-320.webp",
+      "width": 320,
+      "height": 359
+    },
+    {
+      "src": "assets/optimized/tools-products/رولة دهان-640.webp",
+      "width": 640,
+      "height": 718
+    }
+  ],
+  "assets/tools-products/سبراي.webp": [
+    {
+      "src": "assets/optimized/tools-products/سبراي-320.webp",
+      "width": 320,
+      "height": 425
+    },
+    {
+      "src": "assets/optimized/tools-products/سبراي-640.webp",
+      "width": 640,
+      "height": 849
+    }
+  ],
+  "assets/tools-products/سكينة معجون.webp": [
+    {
+      "src": "assets/optimized/tools-products/سكينة معجون-320.webp",
+      "width": 320,
+      "height": 265
+    },
+    {
+      "src": "assets/optimized/tools-products/سكينة معجون-640.webp",
+      "width": 640,
+      "height": 531
+    }
+  ],
+  "assets/tools-products/فرشة دهان.webp": [
+    {
+      "src": "assets/optimized/tools-products/فرشة دهان-320.webp",
+      "width": 320,
+      "height": 320
+    },
+    {
+      "src": "assets/optimized/tools-products/فرشة دهان-640.webp",
+      "width": 640,
+      "height": 640
+    }
+  ],
+  "assets/tools-products/لزق اصفر.webp": [
+    {
+      "src": "assets/optimized/tools-products/لزق اصفر-320.webp",
+      "width": 320,
+      "height": 357
+    },
+    {
+      "src": "assets/optimized/tools-products/لزق اصفر-640.webp",
+      "width": 640,
+      "height": 715
+    }
+  ]
+}

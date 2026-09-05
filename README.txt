@@ -15,3 +15,33 @@
 ملاحظات:
 - صور المنتجات والشعار من مجلد assets.
 - صور الديكور وخط Google وملف Lottie Web من روابط خارجية، لذلك تحتاج اتصال إنترنت لظهورها عند فتح الصفحة.
+
+
+Performance / asset maintenance
+-------------------------------
+The page serves assets/optimized; original assets and hero.json are retained as sources.
+Regenerate delivery assets with Python 3 + Pillow: python scripts/optimize_assets.py
+The generated manifest records image dimensions and responsive variants. If source
+filenames or dimensions change, update HTML/app.js references to match the manifest.
+No build step or package manager is required to serve the site.
+
+Measured file sizes (not a Lighthouse score):
+- Hero data + five WebP images: 800,209 bytes, previously 13,957,888 bytes (~94% less).
+- Largest variants of the 29 referenced local image families: 1,490,964 bytes,
+  previously 9,145,887 bytes (~84% less). Mobile can select smaller variants.
+- Below-fold inline images use native lazy loading, async decoding and dimensions.
+- Lottie and hero data are loaded after window load during idle time, only while
+  the hero is visible and motion/data preferences permit it. The existing gradient
+  remains visible when animation is disabled or the external player cannot load.
+- Scroll handlers coalesce work per animation frame; desktop skips mobile fade measurements.
+
+Hosting: enable Brotli/gzip for HTML, CSS, JS and JSON. Use ETag/Last-Modified
+revalidation for these stable filenames, including optimized assets; do not use
+long-lived immutable caching unless filenames are versioned on every change.
+These server settings depend on the deployment host and are not enabled by this repo.
+Google Fonts, the Lottie player and the lifestyle photo still require internet.
+
+Verification: node --check app.js; git diff --check; Chrome desktop/mobile checks
+for hero playback/offscreen pause, reduced-motion no-download behavior, responsive
+layout, mobile menu, tool images and color switching. Recheck on the deployed host
+with Lighthouse/DevTools to measure actual network timings and Core Web Vitals.

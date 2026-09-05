@@ -454,6 +454,36 @@ body.menu-open .menu-toggle span:last-child {
   background: var(--magenta);
 }
 
+@supports (content-visibility: auto) {
+  .deferred-section {
+    content-visibility: auto;
+  }
+
+  .categories-section {
+    contain-intrinsic-size: 860px;
+  }
+
+  .products-section {
+    contain-intrinsic-size: 1380px;
+  }
+
+  .color-story-section {
+    contain-intrinsic-size: 860px;
+  }
+
+  .lifestyle-band {
+    contain-intrinsic-size: 760px;
+  }
+
+  .partner-section {
+    contain-intrinsic-size: 420px;
+  }
+
+  .contact-section {
+    contain-intrinsic-size: 1120px;
+  }
+}
+
 .categories-section,
 .products-section,
 .contact-section {
@@ -576,13 +606,13 @@ body.menu-open .menu-toggle span:last-child {
       rgba(143, 217, 223, 0.28),
       rgba(255, 255, 255, 0.15)
     ),
-    url("./assets/paints-category.png");
+    image-set(url("assets/optimized/paints-category-640.webp") 1x, url("assets/optimized/paints-category-1280.webp") 2x);
 }
 
 .tools {
   background-image:
     linear-gradient(135deg, rgba(7, 28, 51, 0.16), rgba(231, 47, 138, 0.14)),
-    url("assets/tools-section.png");
+    image-set(url("assets/optimized/tools-section-640.webp") 1x, url("assets/optimized/tools-section-1280.webp") 2x);
 }
 
 .category-card strong {
