@@ -29,6 +29,7 @@
   const activeColorTag = qs("#active-color-tag");
   const backToTop = qs(".back-to-top");
   const fixedContactActions = qs(".fixed-contact-actions");
+  const pageLoader = qs(".page-loader");
   const root = document.documentElement;
 
   const toolProducts = [
@@ -98,6 +99,8 @@
   let heroVideo = null;
   let heroVisible = false;
   let heroAnimationInstance = null;
+  let pageLoaded = false;
+  let heroMediaSettled = !lottieHost;
 
   const buildProductCardMarkup = ({ imagePath, title, category, width, height }) => `
     <article class="product-card">
@@ -215,6 +218,27 @@
 
   const shouldAnimate = () => heroVisible && !document.hidden && !reducedMotion.matches && !saveData();
 
+  const finishPageLoad = () => {
+    if (root.classList.contains("is-loaded")) return;
+    root.classList.remove("is-loading");
+    root.classList.add("is-loaded");
+    pageLoader?.setAttribute("aria-hidden", "true");
+    pageLoader?.style.setProperty("pointer-events", "none");
+    window.setTimeout(() => {
+      pageLoader?.remove();
+    }, 380);
+  };
+
+  const completeInitialLoadIfReady = () => {
+    if (!pageLoaded || !heroMediaSettled) return;
+    finishPageLoad();
+  };
+
+  const settleHeroMedia = () => {
+    heroMediaSettled = true;
+    completeInitialLoadIfReady();
+  };
+
   const bootLottieFallback = async () => {
     if (heroFallbackBooted || !lottieHost) return;
     heroFallbackBooted = true;
@@ -239,13 +263,18 @@
       heroAnimationInstance.addEventListener("DOMLoaded", () => {
         lottieHost.classList.remove("is-error");
         lottieHost.classList.add("is-ready");
+        settleHeroMedia();
         syncHeroPlayback();
       });
-      heroAnimationInstance.addEventListener("data_failed", () => lottieHost.classList.add("is-error"));
+      heroAnimationInstance.addEventListener("data_failed", () => {
+        lottieHost.classList.add("is-error");
+        settleHeroMedia();
+      });
       syncHeroPlayback();
     } catch (error) {
       lottieHost.classList.add("is-error");
       console.warn("Hero animation fallback unavailable", error);
+      settleHeroMedia();
     }
   };
 
@@ -303,8 +332,8 @@
     onViewportChange();
   };
 
-  const bootLottie = async () => {
-    if (heroAnimationBooted || !lottieHost || !shouldAnimate()) return;
+  const bootLottie = async (force = false) => {
+    if (heroAnimationBooted || !lottieHost || (!force && !shouldAnimate())) return;
     heroAnimationBooted = true;
     try {
       heroVideo = document.createElement("video");
@@ -320,6 +349,7 @@
       heroVideo.addEventListener("canplay", () => {
         lottieHost.classList.remove("is-error");
         lottieHost.classList.add("is-ready");
+        settleHeroMedia();
         syncHeroPlayback();
       }, { once: true });
       heroVideo.addEventListener("error", () => {
@@ -416,13 +446,26 @@
   });
   window.addEventListener("pageshow", syncHeroPlayback);
 
-  const finishPageLoad = () => {
-    root.classList.remove("is-loading");
-    root.classList.add("is-loaded");
+  const prepareInitialHeroLoad = () => {
+    pageLoaded = true;
+
+    if (!lottieHost || reducedMotion.matches || saveData()) {
+      settleHeroMedia();
+      return;
+    }
+
+    const hero = qs(".hero-slider");
+    if (hero) {
+      const rect = hero.getBoundingClientRect();
+      heroVisible = rect.bottom > 0 && rect.top < window.innerHeight;
+    }
+
+    bootLottie(true);
+    completeInitialLoadIfReady();
   };
 
-  if (document.readyState === "complete") finishPageLoad();
-  else window.addEventListener("load", finishPageLoad, { once: true });
+  if (document.readyState === "complete") prepareInitialHeroLoad();
+  else window.addEventListener("load", prepareInitialHeroLoad, { once: true });
 
   const closeMenu = () => {
     nav?.classList.remove("open");
