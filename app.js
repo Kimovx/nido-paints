@@ -93,7 +93,7 @@
   let activeSlide = 0;
   let sliderTimer = null;
   let heroAnimationBooted = false;
-  let heroAnimationInstance = null;
+  let heroVideo = null;
   let heroVisible = false;
 
   const buildProductCardMarkup = ({ imagePath, title, category, width, height }) => `
@@ -198,15 +198,6 @@
       .join("");
   };
 
-  const loadScript = (src) => new Promise((resolve, reject) => {
-    const script = document.createElement("script");
-    script.src = src;
-    script.async = true;
-    script.onload = resolve;
-    script.onerror = () => { script.remove(); reject(new Error(`Unable to load ${src}`)); };
-    document.head.append(script);
-  });
-
   const shouldAnimate = () => heroVisible && !document.hidden && !reducedMotion.matches && !saveData();
 
   const deferUntilNearViewport = (selector, callback, { rootMargin = "240px 0px" } = {}) => {
@@ -267,28 +258,27 @@
     if (heroAnimationBooted || !lottieHost || !shouldAnimate()) return;
     heroAnimationBooted = true;
     try {
-      await Promise.all([
-        window.lottie ? Promise.resolve() : loadScript("https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"),
-        window.NIDO_HERO_ANIMATION ? Promise.resolve() : loadScript("assets/optimized/hero-data.js")
-      ]);
-      heroAnimationInstance = window.lottie.loadAnimation({
-        container: lottieHost,
-        renderer: "svg",
-        loop: true,
-        autoplay: false,
-        animationData: window.NIDO_HERO_ANIMATION,
-        rendererSettings: { preserveAspectRatio: "xMidYMid slice", progressiveLoad: true }
-      });
-      heroAnimationInstance.setSubframe(false);
-      heroAnimationInstance.addEventListener("DOMLoaded", () => {
+      heroVideo = document.createElement("video");
+      heroVideo.className = "hero-video";
+      heroVideo.src = "assets/hero.webm";
+      heroVideo.muted = true;
+      heroVideo.loop = true;
+      heroVideo.playsInline = true;
+      heroVideo.preload = "metadata";
+      heroVideo.setAttribute("aria-hidden", "true");
+
+      heroVideo.addEventListener("canplay", () => {
         lottieHost.classList.add("is-ready");
         syncHeroPlayback();
-      });
-      heroAnimationInstance.addEventListener("data_failed", () => lottieHost.classList.add("is-error"));
+      }, { once: true });
+      heroVideo.addEventListener("error", () => lottieHost.classList.add("is-error"), { once: true });
+
+      lottieHost.replaceChildren(heroVideo);
+      heroVideo.load();
       syncHeroPlayback();
     } catch (error) {
       lottieHost.classList.add("is-error");
-      console.warn("Hero animation unavailable", error);
+      console.warn("Hero video unavailable", error);
     }
   };
 
@@ -336,10 +326,12 @@
   const syncHeroPlayback = () => {
     if (shouldAnimate()) {
       bootLottie();
-      heroAnimationInstance?.play();
+      heroVideo?.play()?.catch(() => {
+        lottieHost?.classList.add("is-error");
+      });
       startSlider();
     } else {
-      heroAnimationInstance?.pause();
+      heroVideo?.pause();
       clearInterval(sliderTimer);
     }
   };
@@ -360,7 +352,7 @@
   reducedMotion.addEventListener("change", syncHeroPlayback);
   connection?.addEventListener("change", syncHeroPlayback);
   window.addEventListener("pagehide", () => {
-    heroAnimationInstance?.pause();
+    heroVideo?.pause();
     clearInterval(sliderTimer);
   });
   window.addEventListener("pageshow", syncHeroPlayback);

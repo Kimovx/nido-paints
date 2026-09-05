@@ -280,7 +280,8 @@ body.menu-open .menu-toggle span:last-child {
 }
 
 .lottie-bg svg,
-.lottie-bg canvas {
+.lottie-bg canvas,
+.lottie-bg video {
   width: 100% !important;
   height: 100% !important;
   object-fit: cover;
@@ -1557,6 +1558,11 @@ bdi {
 @media (max-width: 920px) {
   .site-header {
     flex-wrap: wrap;
+  }
+
+  .hero-slider {
+    height: 100svh;
+    min-height: 100svh;
   }
 
   .menu-toggle {
