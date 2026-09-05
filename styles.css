@@ -271,12 +271,33 @@ body.menu-open .menu-toggle span:last-child {
   transition: opacity 0.45s var(--ease);
 }
 
+.lottie-bg::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background:
+    linear-gradient(rgba(7, 28, 51, 0.18), rgba(7, 28, 51, 0.18)),
+    url("assets/poster.webp") center / cover no-repeat;
+  opacity: 1;
+  transition: opacity 0.45s var(--ease);
+}
+
 .lottie-bg.is-ready {
   opacity: 1;
 }
 
+.lottie-bg.is-ready::before {
+  opacity: 0;
+}
+
 .lottie-bg.is-error {
   opacity: 1;
+}
+
+.lottie-bg > * {
+  position: relative;
+  z-index: 1;
 }
 
 .lottie-bg svg,

@@ -93,8 +93,10 @@
   let activeSlide = 0;
   let sliderTimer = null;
   let heroAnimationBooted = false;
+  let heroFallbackBooted = false;
   let heroVideo = null;
   let heroVisible = false;
+  let heroAnimationInstance = null;
 
   const buildProductCardMarkup = ({ imagePath, title, category, width, height }) => `
     <article class="product-card">
@@ -198,7 +200,53 @@
       .join("");
   };
 
+  const loadScript = (src) => new Promise((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = src;
+    script.async = true;
+    script.onload = resolve;
+    script.onerror = () => {
+      script.remove();
+      reject(new Error(`Unable to load ${src}`));
+    };
+    document.head.append(script);
+  });
+
   const shouldAnimate = () => heroVisible && !document.hidden && !reducedMotion.matches && !saveData();
+
+  const bootLottieFallback = async () => {
+    if (heroFallbackBooted || !lottieHost) return;
+    heroFallbackBooted = true;
+    try {
+      heroVideo?.pause();
+      heroVideo?.remove();
+      heroVideo = null;
+      lottieHost.classList.remove("is-error");
+      await Promise.all([
+        window.lottie ? Promise.resolve() : loadScript("https://cdnjs.cloudflare.com/ajax/libs/bodymovin/5.12.2/lottie.min.js"),
+        window.NIDO_HERO_ANIMATION ? Promise.resolve() : loadScript("assets/optimized/hero-data.js")
+      ]);
+      heroAnimationInstance = window.lottie.loadAnimation({
+        container: lottieHost,
+        renderer: "svg",
+        loop: true,
+        autoplay: false,
+        animationData: window.NIDO_HERO_ANIMATION,
+        rendererSettings: { preserveAspectRatio: "xMidYMid slice", progressiveLoad: true }
+      });
+      heroAnimationInstance.setSubframe(false);
+      heroAnimationInstance.addEventListener("DOMLoaded", () => {
+        lottieHost.classList.remove("is-error");
+        lottieHost.classList.add("is-ready");
+        syncHeroPlayback();
+      });
+      heroAnimationInstance.addEventListener("data_failed", () => lottieHost.classList.add("is-error"));
+      syncHeroPlayback();
+    } catch (error) {
+      lottieHost.classList.add("is-error");
+      console.warn("Hero animation fallback unavailable", error);
+    }
+  };
 
   const deferUntilNearViewport = (selector, callback, { rootMargin = "240px 0px" } = {}) => {
     const target = qs(selector);
@@ -266,12 +314,17 @@
       heroVideo.playsInline = true;
       heroVideo.preload = "metadata";
       heroVideo.setAttribute("aria-hidden", "true");
+      heroVideo.setAttribute("autoplay", "");
 
       heroVideo.addEventListener("canplay", () => {
+        lottieHost.classList.remove("is-error");
         lottieHost.classList.add("is-ready");
         syncHeroPlayback();
       }, { once: true });
-      heroVideo.addEventListener("error", () => lottieHost.classList.add("is-error"), { once: true });
+      heroVideo.addEventListener("error", () => {
+        lottieHost.classList.add("is-error");
+        bootLottieFallback();
+      }, { once: true });
 
       lottieHost.replaceChildren(heroVideo);
       heroVideo.load();
@@ -279,6 +332,7 @@
     } catch (error) {
       lottieHost.classList.add("is-error");
       console.warn("Hero video unavailable", error);
+      bootLottieFallback();
     }
   };
 
@@ -328,10 +382,13 @@
       bootLottie();
       heroVideo?.play()?.catch(() => {
         lottieHost?.classList.add("is-error");
+        bootLottieFallback();
       });
+      heroAnimationInstance?.play();
       startSlider();
     } else {
       heroVideo?.pause();
+      heroAnimationInstance?.pause();
       clearInterval(sliderTimer);
     }
   };
@@ -353,6 +410,7 @@
   connection?.addEventListener("change", syncHeroPlayback);
   window.addEventListener("pagehide", () => {
     heroVideo?.pause();
+    heroAnimationInstance?.pause();
     clearInterval(sliderTimer);
   });
   window.addEventListener("pageshow", syncHeroPlayback);
